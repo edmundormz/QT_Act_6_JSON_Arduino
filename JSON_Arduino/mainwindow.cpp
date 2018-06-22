@@ -69,6 +69,7 @@ void MainWindow::recepcionSerialAsyncrona(){
         //arduino->waitForReadyRead(3000);
         QByteArray datosLeidos = arduino->readAll();
         qInfo() << "Entrada: " + datosLeidos;
+        ui->lbReceived->setText(datosLeidos);
 
         QJsonDocument jsonA = QJsonDocument::fromJson(datosLeidos);
         QJsonObject SerialR = jsonA.object();
