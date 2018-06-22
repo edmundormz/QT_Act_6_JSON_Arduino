@@ -44,7 +44,7 @@ void MainWindow::conectarArduino(){
 
     //3-Conexion
     if(arduino_esta_conectado){
-        ui->lbSerialStatus->setText("OK");
+        ui->lbPortName->setText(nombreDispositivoSerial);
         arduino ->setPortName(nombreDispositivoSerial);
         arduino->open(QIODevice::ReadWrite);
         arduino ->setBaudRate(QSerialPort::Baud115200);
