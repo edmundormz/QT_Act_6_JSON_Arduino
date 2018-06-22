@@ -4,19 +4,25 @@
 #include <Firmata.h>
 #include <FirmataMarshaller.h>
 #include <Boards.h>
-
-
 #include <ArduinoJson.h>
 
- double coordenadaX = 0.0;
- double coordenadaY = 0.0;
- int cabezal = 0;
- int carrete = 0;
- String cadenaJSON;
- bool finCadena = false;
+String cadenaJSON;
+bool finCadena = false;
+const int LED1  = 13;
+int STATUS_LED1 = 0;
+const int LED2  = 9;
+int STATUS_LED2 = 0;
+const int ADC1  = 0;
+const int ADC2  = 1;
 
- 
-void JasonRead() {
+void setup() {
+  pinMode(LED1, OUTPUT);
+  pinMode(LED2, OUTPUT);
+  Serial.begin(115200);
+  cadenaJSON.reserve(100);
+}
+
+void JsonRead() {
   StaticJsonBuffer<200> jsonBuffer;
   JsonObject &root = jsonBuffer.parseObject(cadenaJSON);
   // Probar si el "parsing" fue exitoso.
@@ -24,43 +30,24 @@ void JasonRead() {
     //Serial.println("Fallo el parsing");
     return;
   }
- coordenadaX = root["X"];
- coordenadaY = root["Y"];
- cabezal = root["Head"];
- carrete = root["Stack"];
- //Validacion
- if(coordenadaX > 10.5 )  digitalWrite(13, 1);
- else  digitalWrite(13, 0);
- //retornar informacion o acuse de recibo
-  root["X"]= coordenadaX+1;
-  root["Y"]= coordenadaY+1;
-  root["Head"]= cabezal+1;
-  root["Stack"]= carrete+1;
+  digitalWrite(LED1, root["LED1"]);
+  digitalWrite(LED2, root["LED2"]);
+
   root.printTo(Serial);
- 
- //Serial.println("{\"Status\":\"OK\"}");
-}
-
-void setup() {
-  pinMode(13,OUTPUT);
-  Serial.begin(115200);
-  cadenaJSON.reserve(100);
-
 }
 
 void loop() {
-  
-  if(finCadena){
+  if (finCadena) {
     finCadena = false;
-    JasonRead();
+    JsonRead();
     cadenaJSON = "";
   }
 }
 
-void serialEvent(){
-while (Serial.available()) {              //Si existen datos seriales, leer a todos
+void serialEvent() {
+  while (Serial.available()) {              //Si existen datos seriales, leer a todos
     char CaracterEntrada = Serial.read();   //Leer 1 byte serial recibido
-    cadenaJSON += CaracterEntrada;   //Agregar el nuevo char a una cadena String 
+    cadenaJSON += CaracterEntrada;   //Agregar el nuevo char a una cadena String
     if (CaracterEntrada == '}') {          //Si el char o byte recibido es un fin de linea, activa la bandera
       finCadena = true;                        //Si la bandera finCadena = 1, entonces la transmision esta completa
     }

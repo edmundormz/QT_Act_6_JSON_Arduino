@@ -4,6 +4,7 @@
 #include <QSerialPortInfo>
 #include <QDebug>
 #include <QtNetwork>
+#include <QThread>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -11,6 +12,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     conectarArduino();
+    sendJson();
 }
 
 MainWindow::~MainWindow()
@@ -70,3 +72,38 @@ void MainWindow::recepcionSerialAsyncrona(){
         QJsonObject SerialR = jsonA.object();
     }
 }
+
+void MainWindow::sendJson(){
+    cadenaJSON = "{\"LED1\":\"" + LED1 + "\",\"LED2\":\"" + LED2 +"\"}" ;
+    ui->lbSent->setText(cadenaJSON);
+    if(arduino_esta_conectado && arduino->isWritable()){
+        arduino->write(cadenaJSON.toUtf8().constData());//This may work to act5
+        qDebug() << "Salida:" << cadenaJSON.toUtf8().constData();
+        QThread::msleep(200);
+    }
+}
+
+void MainWindow::on_comboBoxLed1_currentIndexChanged(int index)
+{
+    if(index == 0){
+        LED1 = "0";
+    }
+    else if(index == 1){
+        LED1 = "1";
+    }
+    qDebug() << "LED1 " << LED1;
+    sendJson();
+}
+
+void MainWindow::on_comboBoxLed2_currentIndexChanged(int index)
+{
+    if(index == 0){
+        LED2 = "0";
+    }
+    else if(index == 1){
+        LED2 = "1";
+    }
+    qDebug() << "LED2 " << LED2;
+    sendJson();
+}
+
