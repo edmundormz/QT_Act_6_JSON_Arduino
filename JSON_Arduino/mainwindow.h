@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QSerialPort>
 
 namespace Ui {
 class MainWindow;
@@ -17,6 +18,11 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    QSerialPort *arduino;
+
+    bool arduino_esta_conectado = false;
+    void conectarArduino();
+    void recepcionSerialAsyncrona();
 };
 
 #endif // MAINWINDOW_H
