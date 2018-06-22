@@ -11,6 +11,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    ui->lcdN1->setFrameStyle(QFrame::NoFrame);
+    ui->lcdN2->setFrameStyle(QFrame::NoFrame);
     conectarArduino();
     sendJson();
 }
@@ -64,17 +66,25 @@ void MainWindow::recepcionSerialAsyncrona(){
     if(arduino_esta_conectado && arduino->isReadable()){
         int Bytes = arduino->bytesAvailable();
         qInfo() << "DatosDisp: " + QString::number(Bytes);
-        arduino->waitForReadyRead(3000);
+        //arduino->waitForReadyRead(3000);
         QByteArray datosLeidos = arduino->readAll();
         qInfo() << "Entrada: " + datosLeidos;
 
         QJsonDocument jsonA = QJsonDocument::fromJson(datosLeidos);
         QJsonObject SerialR = jsonA.object();
+
+        QJsonValue ADC1 = SerialR.value("ADC1");
+        double value_ADC1 = ADC1.toDouble();
+        ui->lcdN1->display(5*value_ADC1/1024);
+
+        QJsonValue ADC2 = SerialR.value("ADC2");
+        double value_ADC2 = ADC2.toDouble();
+        ui->lcdN2->display(5*value_ADC2/1024);
     }
 }
 
 void MainWindow::sendJson(){
-    cadenaJSON = "{\"LED1\":\"" + LED1 + "\",\"LED2\":\"" + LED2 +"\"}" ;
+    cadenaJSON = "{\"LED1\":\"" + LED1 + "\",\"LED2\":\"" + LED2 + "\",\"ADC1\":\"" + ADC1 + "\",\"ADC2\":\"" + ADC2 +"\"}" ;
     ui->lbSent->setText(cadenaJSON);
     if(arduino_esta_conectado && arduino->isWritable()){
         arduino->write(cadenaJSON.toUtf8().constData());//This may work to act5

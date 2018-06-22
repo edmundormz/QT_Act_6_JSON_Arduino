@@ -33,6 +33,8 @@ private:
     QString cadenaJSON = "";
     QString LED1 = "0";
     QString LED2 = "0";
+    QString ADC1 = "0";
+    QString ADC2 = "0";
 };
 
 #endif // MAINWINDOW_H

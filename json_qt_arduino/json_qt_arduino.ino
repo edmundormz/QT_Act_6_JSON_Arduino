@@ -7,13 +7,18 @@
 #include <ArduinoJson.h>
 
 String cadenaJSON;
+String sendJSON;
 bool finCadena = false;
 const int LED1  = 13;
 int STATUS_LED1 = 0;
 const int LED2  = 9;
 int STATUS_LED2 = 0;
 const int ADC1  = 0;
+int value_ADC1 = 0;
+int read_ADC1 = 0;
 const int ADC2  = 1;
+int value_ADC2 = 0;
+int read_ADC2 = 0;
 
 void setup() {
   pinMode(LED1, OUTPUT);
@@ -22,7 +27,7 @@ void setup() {
   cadenaJSON.reserve(100);
 }
 
-void JsonRead() {
+void JsonReadWrite() {
   StaticJsonBuffer<200> jsonBuffer;
   JsonObject &root = jsonBuffer.parseObject(cadenaJSON);
   // Probar si el "parsing" fue exitoso.
@@ -33,13 +38,19 @@ void JsonRead() {
   digitalWrite(LED1, root["LED1"]);
   digitalWrite(LED2, root["LED2"]);
 
+  root["ADC1"] = analogRead(ADC1);
+  root["ADC2"] = analogRead(ADC2);
   root.printTo(Serial);
+}
+
+void JsonWrite(){
+  
 }
 
 void loop() {
   if (finCadena) {
     finCadena = false;
-    JsonRead();
+    JsonReadWrite();
     cadenaJSON = "";
   }
 }
